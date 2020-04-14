@@ -5,6 +5,7 @@ import store from './store'
 import i18n from './i18n'
 
 import './font-awesome'
+import './assets/scss/custom.scss'
 
 Vue.config.productionTip = false
 

@@ -1,0 +1,16 @@
+// Parties de Bootstrap obligatoires pour modifier le thème
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+// Modifications des variables
+$body-bg: $light;
+
+$theme-colors: map-merge($theme-colors, $colors);
+$theme-colors: map-merge($theme-colors, $grays);
+
+// Import de Bootstrap complet
+@import "~bootstrap/scss/bootstrap";
+
+// Import des ajouts de BootstrapVue
+@import "~bootstrap-vue/src/index";
