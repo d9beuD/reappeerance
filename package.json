@@ -16,6 +16,8 @@
   "main": "background.js",
   "dependencies": {
     "@fortawesome/fontawesome-pro": "^5.13.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "core-js": "^3.6.4",
     "vue": "^2.6.11",
     "vue-i18n": "^8.0.0",
