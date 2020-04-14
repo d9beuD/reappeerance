@@ -1,4 +1,10 @@
 module.exports = {
+  configureWebpack: {
+    resolve: {
+      mainFields: ['main', 'browser']
+    }
+  },
+
   chainWebpack: config => {
     if (process.env.NODE_ENV === 'development') {
       config
