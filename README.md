@@ -1,4 +1,5 @@
 # CoronaChat
+
 ## Project setup
 ```
 npm install
