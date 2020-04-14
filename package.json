@@ -22,6 +22,8 @@
     "@fortawesome/pro-regular-svg-icons": "^5.13.0",
     "@fortawesome/pro-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
+    "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.11.0",
     "core-js": "^3.6.4",
     "vue": "^2.6.11",
     "vue-i18n": "^8.0.0",
