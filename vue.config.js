@@ -39,6 +39,21 @@ module.exports = {
       fallbackLocale: 'fr',
       localeDir: 'locales',
       enableInSFC: true
+    },
+    electronBuilder: {
+      build: {
+        appId: 'workshop.group4.fr',
+        productName: 'CoronaChat',
+        copyright: 'Copyright © 2020 ${author}',
+        mac: {
+          darkModeSupport: true,
+          type: 'distribution',
+          target: 'mas'
+        },
+        win: {
+          target: 'portable'
+        }
+      }
     }
   }
 }
