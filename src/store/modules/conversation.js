@@ -21,6 +21,9 @@ export default {
       })
 
       return bigger
+    },
+    getConversation: (state) => (id) => {
+      return state.conversations.find(conv => conv.id == id)
     }
   },
 

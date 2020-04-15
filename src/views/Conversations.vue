@@ -12,9 +12,7 @@
         </div>
       </div>
       <div class="stretch-scroll">
-        <div :style="{height: '600px'}">
-
-        </div>
+        <conversation-list />
       </div>
       <div class="bg-white p-2 border-top">
         <b-link class="text-muted" :to="{ name: 'Settings' }">
