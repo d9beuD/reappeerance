@@ -13,6 +13,7 @@ export default {
   getters: {
     lastId: (state) => {
       let bigger = 0
+
       state.conversations.map(conv => {
         if (conv.id > bigger) {
           bigger = conv.id
@@ -38,49 +39,73 @@ export default {
         messages: []
       })
     },
+    setPseudo: (state, { conversation, pseudo }) => {
+      state.conversations.find(conv => conv.id === conversation)
+        .pseudo = pseudo
+    },
     addMessage: (state, { conversation, from, content }) => {
       state.conversations.find(conv => conv.id === conversation)
         .messages.push({ from, content })
+    },
+    stopListener: (state) => {
+      state.listener.close(true)
+      state.listener = null
     }
   },
 
   actions: {
-    startListener: ({ commit, rootState }) => {
-      // const app = http.createServer(() => {})
-      // app.listen(rootState.port)
-      // const io = new Server(app, { serveClient: false })
+    startListener: ({ getters, commit, rootState }) => {
+      return new Promise((resolve) => {
+        const io = require('socket.io')(rootState.port, { serveClient: false })
 
-      // io.on('connection', socket => {
-      //   socket.emit('hello')
-      //   socket.on('hello', data => {
-      //     alert(data)
-      //   })
-      // })
+        io.on('connection', function (socket) {
+          const id = getters.lastId + 1
 
-      const io = require('socket.io')(rootState.port, { serveClient: false })
+          socket.on('identity', data => {
+            commit('setPseudo', {
+              conversation: id,
+              pseudo: data.pseudo
+            })
 
-      io.on('connection', function (socket) {
-        alert(socket)
-        socket.on('message', function () { })
-        socket.on('disconnect', function () { })
+            socket.emit('identity', { pseudo: rootState.pseudo })
+          })
+
+          socket.on('message', function () { })
+          socket.on('disconnect', function () { })
+
+          commit('addConversation', {
+            id,
+            listener: socket
+          })
+
+        })
+
+        commit('setListener', io)
+
+        resolve()
       })
-
-      commit('setListener', io)
     },
 
-    startConversation: ({ getters, commit }, { address, port }) => {
-      console.log(address)
-
-      const newId = getters.lastId + 1
+    startConversation: ({ getters, commit, rootState }, { address, port }) => {
+      const id = getters.lastId + 1
       const socket = require('socket.io-client')(`http://${address}:${port}`)
 
+      socket.on('identity', data => {
+        commit('setPseudo', {
+          conversation: id,
+          pseudo: data.pseudo
+        })
+      })
+
       socket.on('connect', () => {
+        socket.emit('identity', { pseudo: rootState.pseudo })
+        console.log('emit', rootState.pseudo)
+
         commit('addConversation', {
-          id: newId,
+          id,
           listener: socket
         })
 
-        alert(socket)
       })
     }
   }
