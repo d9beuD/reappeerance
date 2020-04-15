@@ -18,6 +18,9 @@
         <b-link class="text-muted" :to="{ name: 'Settings' }">
           <font-awesome-icon :icon="['fas', 'cog']" />
         </b-link>
+        <b-link class="text-muted mx-1" :to="{ name: 'Start' }" @click="stopListener">
+          <font-awesome-icon :icon="['fas', 'power-off']" />
+        </b-link>
       </div>
     </div>
     <div class="col d-flex flex-column">
@@ -35,11 +38,18 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
+import ConversationList from '@/components/ConversationList'
 
 export default {
   computed: {
     ...mapState('conversation', ['title'])
+  },
+  methods: {
+    ...mapMutations('conversation', ['stopListener'])
+  },
+  components: {
+    ConversationList
   }
 }
 </script>

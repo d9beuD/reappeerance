@@ -1,7 +1,7 @@
 <template>
   <div class="start-container d-flex justify-content-center align-items-center">
     <b-card title="CoronaChat">
-      <b-form @submit.prevent="startListener">
+      <b-form @submit.prevent="onSubmit">
         <b-form-group label="Pseudo">
           <b-form-input class="rounded-pill" v-model.trim="pseudo" debounce="500" />
         </b-form-group>
@@ -42,7 +42,12 @@ export default {
   },
   methods: {
     ...mapMutations(['setPseudo', 'setPort']),
-    ...mapActions('conversation', ['startListener'])
+    ...mapActions('conversation', ['startListener']),
+    onSubmit () {
+      this.startListener().finally(() => {
+        this.$router.push({ name: 'Conversations' })
+      })
+    }
   }
 }
 </script>
