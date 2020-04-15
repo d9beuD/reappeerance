@@ -107,7 +107,6 @@ export default {
 
       socket.on('connect', () => {
         socket.emit('identity', { pseudo: rootState.pseudo })
-        console.log('emit', rootState.pseudo)
 
         commit('addConversation', {
           id,
@@ -127,7 +126,6 @@ export default {
     },
 
     sendMessage: ({ getters, commit }, { id, content }) => {
-      console.log(id, content)
       getters.getConversation(id).listener.emit('message', { content })
       commit('addMessage', {
         conversation: id,
