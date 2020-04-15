@@ -24,15 +24,7 @@
       </div>
     </div>
     <div class="col d-flex flex-column">
-      <div class="p-2 text-center bg-white border-bottom">
-        {{ title }}
-      </div>
-      <div class="stretch-scroll">
-        <router-view />
-      </div>
-      <div class="border-top p-2">
-        <b-form-input size="sm" class="rounded-pill" />
-      </div>
+      <router-view />
     </div>
   </div>
 </template>
