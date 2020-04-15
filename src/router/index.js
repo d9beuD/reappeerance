@@ -3,6 +3,9 @@ import VueRouter from 'vue-router'
 import EmptyContainer from '@/views/EmptyContainer'
 import Conversations from '@/views/Conversations.vue'
 import Settings from '@/views/Settings.vue'
+import Start from '@/views/Start.vue'
+import Connect from '@/views/Connect.vue'
+import Conversation from '@/views/Conversation.vue'
 
 Vue.use(VueRouter)
 
@@ -14,15 +17,23 @@ Vue.use(VueRouter)
   },
   {
     path: '/conv',
-    component: EmptyContainer,
+    component: Conversations,
     children: [
       {
         path: '',
         name: 'Conversations',
-        component: Conversations
+        component: EmptyContainer
       },
       {
-        path: 'new'
+        path: 'new',
+        name: 'Connect',
+        component: Connect
+      },
+      {
+        path: ':id',
+        name: 'Conversation',
+        component: Conversation,
+        props: true
       }
     ]
   },
@@ -30,6 +41,11 @@ Vue.use(VueRouter)
     path: '/settings',
     name: 'Settings',
     component: Settings
+  },
+  {
+    path: '/start',
+    name: 'Start',
+    component: Start
   }
 ]
 

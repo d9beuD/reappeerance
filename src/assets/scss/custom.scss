@@ -29,6 +29,12 @@ $theme-colors: map-merge($theme-colors, $grays);
   }
 }
 
+.start-container {
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
 .stretch-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
