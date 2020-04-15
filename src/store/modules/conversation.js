@@ -73,18 +73,23 @@ export default {
             socket.emit('identity', { pseudo: rootState.pseudo })
           })
 
-          socket.on('message', function () { })
+          socket.on('message', data => {
+            const pseudo = getters.getConversation(id).pseudo
+            commit('addMessage', {
+              conversation: id,
+              from: pseudo,
+              content: data.content
+            })
+          })
           socket.on('disconnect', function () { })
 
           commit('addConversation', {
             id,
             listener: socket
           })
-
         })
 
         commit('setListener', io)
-
         resolve()
       })
     },
@@ -109,6 +114,25 @@ export default {
           listener: socket
         })
 
+      })
+
+      socket.on('message', data => {
+        const pseudo = getters.getConversation(id).pseudo
+        commit('addMessage', {
+          conversation: id,
+          from: pseudo,
+          content: data.content
+        })
+      })
+    },
+
+    sendMessage: ({ getters, commit }, { id, content }) => {
+      console.log(id, content)
+      getters.getConversation(id).listener.emit('message', { content })
+      commit('addMessage', {
+        conversation: id,
+        from: 'me',
+        content
       })
     }
   }

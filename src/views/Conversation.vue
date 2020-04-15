@@ -4,13 +4,15 @@
       {{ conversation.pseudo }}
     </div>
     <div class="stretch-scroll p-2">
-
+      <div v-for="(message, index) in conversation.messages" :key="index">
+        {{ message.content }}
+      </div>
     </div>
     <div class="border-top p-2">
-      <b-form>
+      <b-form @submit.prevent="onSubmit">
         <div class="row no-gutters">
           <div class="col">
-            <b-form-input size="sm" class="rounded-pill" />
+            <b-form-input v-model="message" size="sm" class="rounded-pill" />
           </div>
           <div class="col-auto">
             <b-button type="submit" variant="link" size="sm">
@@ -24,7 +26,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   props: {
@@ -33,10 +35,22 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      message: ''
+    }
+  },
   computed: {
     ...mapGetters('conversation', ['getConversation']),
     conversation () {
       return this.getConversation(this.id)
+    }
+  },
+  methods: {
+    ...mapActions('conversation', ['sendMessage']),
+    onSubmit () {
+      this.sendMessage({ id: this.id, content: this.message })
+      this.message = ''
     }
   }
 }

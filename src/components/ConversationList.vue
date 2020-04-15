@@ -1,6 +1,7 @@
 <template>
   <b-list-group flush>
     <b-list-group-item
+      class="px-1"
       v-for="conv in conversations"
       :key="conv.id"
       :to="{ name: 'Conversation', params: { id: conv.id }}"
@@ -11,7 +12,7 @@
               {{ conv.pseudo.charAt(0) }}
             </b-avatar>
           </div>
-          <div class="col" :style="{lineHeight: '1rem'}">
+          <div class="col text-truncate" :style="{lineHeight: '1rem', minWidth: 0}">
             <div>
               {{ conv.pseudo }}
             </div>
