@@ -1,11 +1,13 @@
-// import http from 'http'
-// import Server from 'socket.io'
+import { PUBLIC_KEY, encrypt, decrypt } from '@/crypto'
+import { PRIVATE_KEY } from '../../crypto'
+
+const CONVERSATIONS = 'app.conversations'
 
 export default {
   namespaced: true,
 
   state: {
-    conversations: [],
+    conversations: localStorage.getItem(CONVERSATIONS) || [],
     listener: null,
     title: 'Nouvelle conversation'
   },
@@ -24,7 +26,10 @@ export default {
     },
     getConversation: (state) => (id) => {
       return state.conversations.find(conv => conv.id == id)
-    }
+    },
+    // getConvCopy: (state) => {
+
+    // }
   },
 
   mutations: {
@@ -39,12 +44,17 @@ export default {
         id,
         listener,
         pseudo: '',
+        publicKey: '',
         messages: []
       })
     },
     setPseudo: (state, { conversation, pseudo }) => {
       state.conversations.find(conv => conv.id === conversation)
         .pseudo = pseudo
+    },
+    setPublicKey: (state, { conversation, publicKey }) => {
+      state.conversations.find(conv => conv.id === conversation)
+        .publicKey = publicKey
     },
     addMessage: (state, { conversation, from, content }) => {
       state.conversations.find(conv => conv.id === conversation)
@@ -53,7 +63,8 @@ export default {
     stopListener: (state) => {
       state.listener.close(true)
       state.listener = null
-    }
+    },
+    // save: (state, payload) => {}
   },
 
   actions: {
@@ -70,7 +81,12 @@ export default {
               pseudo: data.pseudo
             })
 
-            socket.emit('identity', { pseudo: rootState.pseudo })
+            commit('setPublicKey', {
+              conversation: id,
+              publicKey: data.publicKey
+            })
+
+            socket.emit('identity', { pseudo: rootState.pseudo, publicKey: localStorage.getItem(PUBLIC_KEY) })
           })
 
           socket.on('message', data => {
@@ -78,7 +94,7 @@ export default {
             commit('addMessage', {
               conversation: id,
               from: pseudo,
-              content: data.content
+              content: decrypt(data.content, localStorage.getItem(PRIVATE_KEY))
             })
           })
           socket.on('disconnect', function () { })
@@ -103,10 +119,15 @@ export default {
           conversation: id,
           pseudo: data.pseudo
         })
+
+        commit('setPublicKey', {
+          conversation: id,
+          publicKey: data.publicKey
+        })
       })
 
       socket.on('connect', () => {
-        socket.emit('identity', { pseudo: rootState.pseudo })
+        socket.emit('identity', { pseudo: rootState.pseudo, publicKey: localStorage.getItem(PUBLIC_KEY) })
 
         commit('addConversation', {
           id,
@@ -120,18 +141,21 @@ export default {
         commit('addMessage', {
           conversation: id,
           from: pseudo,
-          content: data.content
+          content: decrypt(data.content, localStorage.getItem(PRIVATE_KEY))
         })
       })
     },
 
     sendMessage: ({ getters, commit }, { id, content }) => {
-      getters.getConversation(id).listener.emit('message', { content })
+
       commit('addMessage', {
         conversation: id,
         from: 'me',
         content
       })
+
+      content = encrypt(content, getters.getConversation(id).publicKey)
+      getters.getConversation(id).listener.emit('message', { content })
     }
   }
 }

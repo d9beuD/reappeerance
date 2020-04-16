@@ -14,7 +14,7 @@
           <b-avatar class="mr-1" :text="conversation.pseudo.charAt(0)" size="2rem" />
         </div>
         <div
-          class="px-2 py-1 border"
+          class="px-2 py-1 border border-light"
           :class="['bg-' + (message.from == 'me' ? 'primary':'300'), 'text-' + (message.from == 'me' ? 'white':'dark')]"
           :style="{borderRadius: '15px', maxWidth: '75%'}"
           >

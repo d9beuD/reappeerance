@@ -7,6 +7,7 @@ import { BootstrapVue } from 'bootstrap-vue'
 
 import './font-awesome'
 import './assets/scss/custom.scss'
+import './crypto'
 
 Vue.use(BootstrapVue)
 
