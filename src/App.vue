@@ -19,6 +19,9 @@ export default {
     if (this.pseudo.length > 0 && this.port > 0) {
       if (this.listener === null) {
         this.startListener()
+          .finally(() => {
+            this.$router.push({ name: 'Conversations' })
+          })
       }
     } else {
       this.$router.push({ name: 'Start' })

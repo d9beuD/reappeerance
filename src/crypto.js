@@ -1,12 +1,14 @@
 import crypto from 'crypto'
 
 // Set unique identifier
-const UNIQUE_IDENTIFIER = 'app.uniqueIdentifier'
+export const UNIQUE_IDENTIFIER = 'app.uniqueIdentifier'
 export const PUBLIC_KEY =  'app.publicKey'
 export const PRIVATE_KEY = 'app.privateKey'
 const passphrase = 'top_secret'
 
-let identifier = localStorage.getItem(UNIQUE_IDENTIFIER) || `${Date.now()}-${Math.random()}-${Math.random()}`
+export let identifier = localStorage.getItem(UNIQUE_IDENTIFIER)
+  || hash(`${Date.now()}-${Math.random()}-${Math.random()}`)
+
 localStorage.setItem(UNIQUE_IDENTIFIER, identifier)
 
 const asymmetricKeyPair = crypto.generateKeyPairSync('rsa', {
@@ -37,4 +39,14 @@ export function decrypt(toDecrypt, privateKey) {
     key: privateKey,
     passphrase
   }), decryptBuffer).toString('utf-8')
+}
+
+export function hash(data) {
+  return crypto.createHash('sha256')
+    .update(data)
+    .digest('hex')
+}
+
+export function getUniqueId() {
+  return hash(`${Date.now()}-${Math.random()}-${Math.random()}`)
 }

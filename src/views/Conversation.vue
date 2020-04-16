@@ -1,21 +1,21 @@
 <template>
   <div class="stretch-scroll d-flex flex-column h-100">
     <div class="p-2 text-center bg-white border-bottom">
-      {{ conversation.pseudo }}
+      {{ conversation.identity.pseudo }}
     </div>
     <div ref="scroll" class="stretch-scroll p-2">
       <div
         class="d-flex"
-        :class="{'justify-content-end': message.from =='me', 'mt-2': (index > 0 ? conversation.messages[index - 1].from != message.from ? true:false:false)}"
+        :class="{'justify-content-end': message.from ==identifier, 'mt-2': (index > 0 ? conversation.messages[index - 1].from != message.from ? true:false:false)}"
         v-for="(message, index) in conversation.messages"
         :key="index"
         >
-        <div v-if="message.from != 'me'">
-          <b-avatar class="mr-1" :text="conversation.pseudo.charAt(0)" size="2rem" />
+        <div v-if="message.from != identifier">
+          <b-avatar class="mr-1" :text="conversation.identity.pseudo.charAt(0)" size="2rem" />
         </div>
         <div
           class="px-2 py-1 border border-light"
-          :class="['bg-' + (message.from == 'me' ? 'primary':'300'), 'text-' + (message.from == 'me' ? 'white':'dark')]"
+          :class="['bg-' + (message.from == identifier ? 'primary':'300'), 'text-' + (message.from == identifier ? 'white':'dark')]"
           :style="{borderRadius: '15px', maxWidth: '75%'}"
           >
           {{ message.content }}
@@ -40,12 +40,12 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   props: {
     id: {
-      type: Number,
+      type: String,
       required: true
     }
   },
@@ -55,6 +55,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('conversation', ['identifier']),
     ...mapGetters('conversation', ['getConversation']),
     conversation () {
       return this.getConversation(this.id)
