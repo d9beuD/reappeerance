@@ -41,14 +41,16 @@ module.exports = {
       enableInSFC: true
     },
     electronBuilder: {
-      build: {
+      builderOptions: {
         appId: 'workshop.group4.fr',
         productName: 'CoronaChat',
         copyright: 'Copyright © 2020 ${author}',
         mac: {
+          category: 'public.app-category.social-networking',
           darkModeSupport: true,
           type: 'distribution',
-          target: 'mas'
+          icon: './build/icons/icon.icns',
+          target: 'dmg',
         },
         win: {
           target: 'portable'
