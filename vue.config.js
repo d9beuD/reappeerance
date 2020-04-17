@@ -53,7 +53,8 @@ module.exports = {
           target: 'dmg',
         },
         win: {
-          target: 'portable'
+          target: 'portable',
+          icon: './build/icons/icon.ico'
         }
       }
     },
