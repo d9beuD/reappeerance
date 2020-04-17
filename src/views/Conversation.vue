@@ -4,21 +4,23 @@
       {{ conversation.identity.pseudo }}
     </div>
     <div ref="scroll" class="stretch-scroll p-2">
-      <div
-        class="d-flex"
-        :class="{'justify-content-end': message.from ==identifier, 'mt-2': (index > 0 ? conversation.messages[index - 1].from != message.from ? true:false:false)}"
-        v-for="(message, index) in conversation.messages"
-        :key="index"
-        >
-        <div v-if="message.from != identifier">
-          <b-avatar class="mr-1" :text="conversation.identity.pseudo.charAt(0)" size="2rem" />
-        </div>
+      <div ref="container">
         <div
-          class="px-2 py-1 border border-light"
-          :class="['bg-' + (message.from == identifier ? 'primary':'300'), 'text-' + (message.from == identifier ? 'white':'dark')]"
-          :style="{borderRadius: '15px', maxWidth: '75%'}"
+          class="d-flex"
+          :class="{'justify-content-end': message.from ==identifier, 'mt-2': (index > 0 ? conversation.messages[index - 1].from != message.from ? true:false:false)}"
+          v-for="(message, index) in conversation.messages"
+          :key="index"
           >
-          {{ message.content }}
+          <div v-if="message.from != identifier">
+            <b-avatar class="mr-1" :text="conversation.identity.pseudo.charAt(0)" size="2rem" />
+          </div>
+          <div
+            class="px-2 py-1 border border-light"
+            :class="['bg-' + (message.from == identifier ? 'primary':'300'), 'text-' + (message.from == identifier ? 'white':'dark')]"
+            :style="{borderRadius: '15px', maxWidth: '75%'}"
+            >
+            {{ message.content }}
+          </div>
         </div>
       </div>
     </div>
@@ -71,7 +73,7 @@ export default {
   watch: {
     'conversation.messages' () {
       this.$nextTick(() => {
-        this.$refs.scroll.scrollTop = this.$refs.scroll.clientHeight
+        this.$refs.scroll.scrollTop = this.$refs.container.clientHeight
       })
     }
   }
