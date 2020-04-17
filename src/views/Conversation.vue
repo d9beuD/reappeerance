@@ -72,7 +72,7 @@ export default {
     ...mapState('conversation', ['identifier', 'conversations']),
     ...mapState(['hasFocus']),
     conversation () {
-      return this.conversations.find(conv => conv.id = this.id)
+      return this.conversations.find(conv => conv.id == this.id)
     },
   },
   methods: {

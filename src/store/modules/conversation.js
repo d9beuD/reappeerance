@@ -50,7 +50,7 @@ export default {
     addConversation: (state, { id, pseudo, identifier, publicKey, listener }) => {
       const conv = state.conversations.find(c => c.identity.identifier === identifier)
       if (conv !== undefined) {
-        conv.identify = {
+        conv.identity = {
           pseudo,
           identifier,
           publicKey
