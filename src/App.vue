@@ -5,12 +5,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
+import remote from 'electron'
 
 export default {
   computed: {
     ...mapState(['pseudo', 'port']),
-    ...mapState('conversation', ['listener'])
+    ...mapState('conversation', ['listener']),
+    ...mapGetters('conversation', ['unread'])
   },
   methods: {
     ...mapActions('conversation', ['startListener'])
@@ -25,6 +27,12 @@ export default {
       }
     } else {
       this.$router.push({ name: 'Start' })
+    }
+  },
+  watch: {
+    unread (value) {
+      const app = remote.app
+      app.setBadgeCount(value)
     }
   }
 }
