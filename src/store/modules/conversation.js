@@ -71,7 +71,20 @@ export default {
 
     addMessage: (state, { conversation, from, content, id }) => {
       state.conversations.find(conv => conv.id === conversation)
-        .messages.push({ from, content, id, read: false })
+        .messages.push({ from, content, id, read: false, timestamp: new Date().getTime() })
+
+      state.conversations.sort((a, b) => {
+        if (a.messages.length > 0) {
+          if (b.messages.length > 0) {
+            return b.messages[b.messages.length - 1].timestamp
+              - a.messages[a.messages.length - 1].timestamp
+          }
+
+          return -1
+        }
+
+        return 1
+      })
     },
 
     stopListener: (state) => {
