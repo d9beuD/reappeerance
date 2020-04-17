@@ -6,7 +6,6 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
-import remote from 'electron'
 
 export default {
   computed: {
@@ -15,7 +14,8 @@ export default {
     ...mapGetters('conversation', ['unread'])
   },
   methods: {
-    ...mapActions('conversation', ['startListener'])
+    ...mapActions('conversation', ['startListener']),
+    ...mapActions(['init'])
   },
   created () {
     if (this.pseudo.length > 0 && this.port > 0) {
@@ -31,9 +31,12 @@ export default {
   },
   watch: {
     unread (value) {
-      const app = remote.app
+      const { app } = require('electron').remote
       app.setBadgeCount(value)
     }
+  },
+  mounted () {
+    this.init()
   }
 }
 </script>

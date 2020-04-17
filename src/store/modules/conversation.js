@@ -1,4 +1,5 @@
 import { PUBLIC_KEY, PRIVATE_KEY, encrypt, decrypt, identifier, getUniqueId } from '@/crypto'
+import { notify } from '@/notifier'
 
 const CONVERSATIONS = 'app.conversations'
 
@@ -135,6 +136,10 @@ export default {
           id: data.id,
           user,
           content: decrypt(data.content, localStorage.getItem(PRIVATE_KEY))
+        })
+
+        notify(user.pseudo, {
+          body: content
         })
       })
     },
