@@ -25,8 +25,28 @@ export default {
 
       return bigger
     },
+
     getConversation: (state) => (id) => {
       return state.conversations.find(conv => conv.id == id)
+    },
+
+    getMessage: (state) => ({ conversation, message }) => {
+      return state.conversations.find(conv => conv.id === conversation)
+        .messages.find(msg => msg.id === message)
+    },
+
+    unread: (state) => {
+      let count = 0
+
+      state.conversations.map(conv => {
+        conv.messages.map(msg => {
+          if (!msg.read) {
+            count += 1
+          }
+        })
+      })
+
+      return count
     }
   },
 
@@ -62,19 +82,24 @@ export default {
       }
     },
 
-    addMessage: (state, { conversation, from, content }) => {
+    addMessage: (state, { conversation, from, content, id }) => {
       state.conversations.find(conv => conv.id === conversation)
-        .messages.push({ from, content })
+        .messages.push({ from, content, id, read: false })
     },
 
     stopListener: (state) => {
       state.listener.close(true)
       state.listener = null
     },
+
+    markAsRead: (state, { conversation, message }) => {
+      state.conversations.find(conv => conv.id === conversation)
+        .messages.find(msg => msg.id === message).read = true
+    }
   },
 
   actions: {
-    startListener: ({ getters, commit, dispatch, rootState }) => {
+    startListener: ({ commit, dispatch, rootState }) => {
       return new Promise((resolve) => {
         const io = require('socket.io')(rootState.port, { serveClient: false })
 
@@ -88,20 +113,13 @@ export default {
               identifier: data.identifier,
               publicKey: data.publicKey,
               listener: socket
+            }).then(() => {
+              dispatch('setEvents', { socket, convId: id })
             })
 
             dispatch('sendIdentity', socket)
           })
 
-          socket.on('message', data => {
-            const pseudo = getters.getConversation(id).identity.identifier
-            dispatch('addMessage', {
-              conversation: id,
-              user: pseudo,
-              content: decrypt(data.content, localStorage.getItem(PRIVATE_KEY)),
-              id: data.id
-            })
-          })
           socket.on('disconnect', function () { })
         })
 
@@ -110,13 +128,12 @@ export default {
       })
     },
 
-    startConversation: ({ getters, dispatch }, { address, port }) => {
+    startConversation: ({ dispatch }, { address, port }) => {
       const id = getUniqueId()
       const socket = require('socket.io-client')(`http://${address}:${port}`)
 
       socket.on('connect', () => {
         dispatch('sendIdentity', socket)
-
       })
 
       socket.on('identity', data => {
@@ -126,34 +143,46 @@ export default {
           identifier: data.identifier,
           publicKey: data.publicKey,
           listener: socket
+        }).then(() => {
+          dispatch('setEvents', { socket, convId: id })
         })
       })
+    },
 
-      socket.on('message', data => {
-        const user = getters.getConversation(id).identity.identifier
+    setEvents: ({ getters, dispatch }, { socket, convId }) => {
+      const user = getters.getConversation(convId).identity
+
+      socket.on('message', ({ content, id }) => {
+        content = decrypt(content, localStorage.getItem(PRIVATE_KEY))
+
         dispatch('addMessage', {
-          conversation: id,
-          id: data.id,
-          user,
-          content: decrypt(data.content, localStorage.getItem(PRIVATE_KEY))
+          conversation: convId,
+          id,
+          user: user.identifier,
+          content
         })
 
         notify(user.pseudo, {
           body: content
         })
       })
+
+      socket.on('read', ({ message }) => {
+        dispatch('markAsRead', { conversation: convId, message })
+      })
     },
 
     sendMessage: ({ getters, dispatch }, { id, content }) => {
+      const msgId = getUniqueId()
       dispatch('addMessage', {
         conversation: id,
         user: identifier,
         content,
-        id: getUniqueId()
+        id: msgId
       })
 
       content = encrypt(content, getters.getConversation(id).identity.publicKey)
-      getters.getConversation(id).listener.emit('message', { content })
+      getters.getConversation(id).listener.emit('message', { content, id: msgId })
     },
 
     sendIdentity: ({ rootState }, socket) => {
@@ -165,13 +194,15 @@ export default {
     },
 
     addConversation: ({ commit }, data) => {
-      console.log(data)
-      commit('addConversation', {
-        id: data.id,
-        pseudo: data.pseudo,
-        identifier: data.identifier,
-        publicKey: data.publicKey,
-        listener: data.listener
+      return new Promise((resolve) => {
+        commit('addConversation', {
+          id: data.id,
+          pseudo: data.pseudo,
+          identifier: data.identifier,
+          publicKey: data.publicKey,
+          listener: data.listener
+        })
+        resolve()
       })
     },
 
@@ -181,6 +212,22 @@ export default {
         id,
         from: user,
         content
+      })
+    },
+
+    markAsRead: ({ getters, commit }, { conversation, message }) => {
+      const msg = getters.getMessage({ conversation, message })
+      const conv = getters.getConversation(conversation)
+
+      if (msg.from !== identifier) {
+        conv.listener.emit('read', {
+          message
+        })
+      }
+
+      commit('markAsRead', {
+        conversation,
+        message
       })
     }
   }

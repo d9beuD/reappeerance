@@ -6,20 +6,32 @@
     <div ref="scroll" class="stretch-scroll p-2">
       <div ref="container">
         <div
-          class="d-flex"
-          :class="{'justify-content-end': message.from ==identifier, 'mt-2': (index > 0 ? conversation.messages[index - 1].from != message.from ? true:false:false)}"
           v-for="(message, index) in conversation.messages"
           :key="index"
           >
-          <div v-if="message.from != identifier">
-            <b-avatar class="mr-1" :text="conversation.identity.pseudo.charAt(0)" size="2rem" />
+          <div
+            class="d-flex"
+            :class="{'justify-content-end': message.from ==identifier, 'mt-2': (index > 0 ? conversation.messages[index - 1].from != message.from ? true:false:false)}"
+            >
+            <div v-if="message.from != identifier">
+              <b-avatar class="mr-1" :text="conversation.identity.pseudo.charAt(0)" size="2rem" />
+            </div>
+            <div
+              class="px-2 py-1 border border-light"
+              :class="['bg-' + (message.from == identifier ? 'primary':'300'), 'text-' + (message.from == identifier ? 'white':'dark')]"
+              :style="{borderRadius: '15px', maxWidth: '75%'}"
+              >
+              {{ message.content }}
+            </div>
           </div>
           <div
-            class="px-2 py-1 border border-light"
-            :class="['bg-' + (message.from == identifier ? 'primary':'300'), 'text-' + (message.from == identifier ? 'white':'dark')]"
-            :style="{borderRadius: '15px', maxWidth: '75%'}"
+            v-if="(index + 1) == conversation.messages.length"
+            class="w-100 text-right pr-1"
+            :style="{lineHeight: '.9rem'}"
             >
-            {{ message.content }}
+            <small v-if="message.from == identifier && message.read" class="text-muted">
+              Lu
+            </small>
           </div>
         </div>
       </div>
@@ -42,7 +54,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   props: {
@@ -57,17 +69,29 @@ export default {
     }
   },
   computed: {
-    ...mapState('conversation', ['identifier']),
-    ...mapGetters('conversation', ['getConversation']),
+    ...mapState('conversation', ['identifier', 'conversations']),
+    ...mapState(['hasFocus']),
     conversation () {
-      return this.getConversation(this.id)
-    }
+      return this.conversations.find(conv => conv.id = this.id)
+    },
   },
   methods: {
-    ...mapActions('conversation', ['sendMessage']),
+    ...mapActions('conversation', ['sendMessage', 'markAsRead']),
     onSubmit () {
       this.sendMessage({ id: this.id, content: this.message })
       this.message = ''
+    },
+    checkMessages () {
+      this.conversation.messages.forEach(msg => {
+        if (msg.from != this.identifier) {
+          if (!msg.read) {
+            this.markAsRead({
+              conversation: this.conversation.id,
+              message: msg.id
+            })
+          }
+        }
+      })
     }
   },
   watch: {
@@ -75,6 +99,23 @@ export default {
       this.$nextTick(() => {
         this.$refs.scroll.scrollTop = this.$refs.container.clientHeight
       })
+
+      if (this.hasFocus) {
+        this.checkMessages()
+      }
+    },
+    hasFocus (value) {
+      if (value) {
+        this.checkMessages()
+      }
+    },
+    id () {
+      this.checkMessages()
+    }
+  },
+  created () {
+    if (this.conversation == undefined) {
+      this.$router.push({ name: 'Conversations' })
     }
   }
 }
