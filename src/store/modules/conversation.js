@@ -14,18 +14,6 @@ export default {
   },
 
   getters: {
-    lastId: (state) => {
-      let bigger = 0
-
-      state.conversations.map(conv => {
-        if (conv.id > bigger) {
-          bigger = conv.id
-        }
-      })
-
-      return bigger
-    },
-
     getConversation: (state) => (id) => {
       return state.conversations.find(conv => conv.id == id)
     },
@@ -60,7 +48,6 @@ export default {
     },
 
     addConversation: (state, { id, pseudo, identifier, publicKey, listener }) => {
-      console.log(listener)
       const conv = state.conversations.find(c => c.identity.identifier === identifier)
       if (conv !== undefined) {
         conv.identify = {
