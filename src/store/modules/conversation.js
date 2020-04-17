@@ -192,10 +192,12 @@ export default {
       })
 
       content = encrypt(content, getters.getConversation(id).identity.publicKey)
+      getters.getConversation(id).listener.emit('typing', false)
       getters.getConversation(id).listener.emit('message', { content, id: msgId })
     },
 
     sendIdentity: ({ rootState }, socket) => {
+      console.log('sendIdentity')
       socket.emit('identity', {
         pseudo: rootState.pseudo,
         publicKey: localStorage.getItem(PUBLIC_KEY),

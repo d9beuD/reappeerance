@@ -21,9 +21,11 @@
         :length="0"
         :show="typing"
         >
-          <b-spinner type="grow" label="Loading..." :style="{height: '1rem', width: '1rem'}" />
-          <b-spinner type="grow" label="Loading..." :style="{height: '1rem', width: '1rem'}" />
-          <b-spinner type="grow" label="Loading..." :style="{height: '1rem', width: '1rem'}" />
+          <div class="d-flex align-items-end" :style="{height: '1rem'}">
+            <b-spinner type="grow" label="Loading..." :style="{height: spinnerSize, width: spinnerSize}" />
+            <b-spinner type="grow" label="Loading..." :style="{height: spinnerSize, width: spinnerSize}" />
+            <b-spinner type="grow" label="Loading..." :style="{height: spinnerSize, width: spinnerSize}" />
+          </div>
       </message-list-item>
     </transition>
   </div>
@@ -45,6 +47,11 @@ export default {
     typing: {
       type: Boolean,
       required: true
+    }
+  },
+  data () {
+    return {
+      spinnerSize: '.5rem'
     }
   },
   components: {
