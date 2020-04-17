@@ -64,7 +64,8 @@ export default {
             publicKey
           },
           listener,
-          messages: []
+          messages: [],
+          typing: false
         })
       }
     },
@@ -95,6 +96,11 @@ export default {
     markAsRead: (state, { conversation, message }) => {
       state.conversations.find(conv => conv.id === conversation)
         .messages.find(msg => msg.id === message).read = true
+    },
+
+    setTyping: (state, { conversation, isTyping }) => {
+      state.conversations.find(conv => conv.id === conversation)
+        .typing = isTyping
     }
   },
 
@@ -149,7 +155,7 @@ export default {
       })
     },
 
-    setEvents: ({ getters, dispatch }, { socket, convId }) => {
+    setEvents: ({ getters, commit, dispatch }, { socket, convId }) => {
       const user = getters.getConversation(convId).identity
 
       socket.on('message', ({ content, id }) => {
@@ -169,6 +175,10 @@ export default {
 
       socket.on('read', ({ message }) => {
         dispatch('markAsRead', { conversation: convId, message })
+      })
+
+      socket.on('typing', (isTyping) => {
+        commit('setTyping', { conversation: convId, isTyping })
       })
     },
 
@@ -229,6 +239,11 @@ export default {
         conversation,
         message
       })
+    },
+
+    sendTyping: ({ getters }, { conversation, isTyping }) => {
+      const conv = getters.getConversation(conversation)
+      conv.listener.emit('typing', isTyping)
     }
   }
 }
