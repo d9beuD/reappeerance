@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import {
   createProtocol,
   /* installVueDevtools */
@@ -65,13 +65,24 @@ app.on('ready', async () => {
     // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
     try {
       // await installVueDevtools()
-      win.addDevToolsExtension('node_modules/vue-devtools/vender')
+      // win.addDevToolsExtension('node_modules/vue-devtools/vender')
     } catch (e) {
       console.error('Vue Devtools failed to install:', e.toString())
     }
 
   }
   createWindow()
+})
+
+ipcMain.on('init', (event) => {
+  console.log('init')
+  app.on('browser-window-focus', () => {
+    event.reply('focus')
+  })
+
+  app.on('browser-window-blur', () => {
+    event.reply('blur')
+  })
 })
 
 // Exit cleanly on request from parent process in development mode.

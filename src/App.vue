@@ -1,32 +1,42 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+  <div class="d-flex flex-column" id="app">
     <router-view/>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import { mapState, mapGetters, mapActions } from 'vuex'
 
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+export default {
+  computed: {
+    ...mapState(['pseudo', 'port']),
+    ...mapState('conversation', ['listener']),
+    ...mapGetters('conversation', ['unread'])
+  },
+  methods: {
+    ...mapActions('conversation', ['startListener']),
+    ...mapActions(['init'])
+  },
+  created () {
+    if (this.pseudo.length > 0 && this.port > 0) {
+      if (this.listener === null) {
+        this.startListener()
+          .finally(() => {
+            this.$router.push({ name: 'Conversations' })
+          })
+      }
+    } else {
+      this.$router.push({ name: 'Start' })
     }
+  },
+  watch: {
+    unread (value) {
+      const { app } = require('electron').remote
+      app.setBadgeCount(value)
+    }
+  },
+  mounted () {
+    this.init()
   }
 }
-</style>
+</script>

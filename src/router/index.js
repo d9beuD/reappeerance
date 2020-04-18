@@ -1,6 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import EmptyContainer from '@/views/EmptyContainer'
+import Conversations from '@/views/Conversations.vue'
+import Settings from '@/views/Settings.vue'
+import Start from '@/views/Start.vue'
+import Connect from '@/views/Connect.vue'
+import Conversation from '@/views/Conversation.vue'
 
 Vue.use(VueRouter)
 
@@ -8,15 +13,39 @@ Vue.use(VueRouter)
   {
     path: '/',
     name: 'Home',
-    component: Home
+    redirect: { name: 'Conversations'}
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/conv',
+    component: Conversations,
+    children: [
+      {
+        path: '',
+        name: 'Conversations',
+        component: EmptyContainer
+      },
+      {
+        path: 'new',
+        name: 'Connect',
+        component: Connect
+      },
+      {
+        path: ':id',
+        name: 'Conversation',
+        component: Conversation,
+        props: true
+      }
+    ]
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings
+  },
+  {
+    path: '/start',
+    name: 'Start',
+    component: Start
   }
 ]
 
